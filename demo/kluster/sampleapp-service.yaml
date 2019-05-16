@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: sample-app-service
+  namespace: kubeintro
+spec:
+  type: ClusterIP
+  selector:
+    app: sample-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8080
+    targetPort: 8080

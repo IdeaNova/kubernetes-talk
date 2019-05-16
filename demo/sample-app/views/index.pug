@@ -1,0 +1,10 @@
+html
+  head
+    title= title
+  body
+    h1= title
+    h2 environment
+    ul
+        for name in Object.keys(env).sort()
+          li=`${name}: ${env[name]}`
+    p !{new Date()}

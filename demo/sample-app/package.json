@@ -1,0 +1,15 @@
+{
+  "name": "sample-app",
+  "version": "1.0.0",
+  "description": "Node.js sample app for Kubernetes Talk",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Janne Pelkonen/IdeaNova Technologies, Inc.",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.4",
+    "pug": "^2.0.3"
+  }
+}

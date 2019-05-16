@@ -1,0 +1,5 @@
+.vagrant
+.images.tar
+.kube_config
+join.sh
+*.log

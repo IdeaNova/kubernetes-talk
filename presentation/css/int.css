@@ -1,0 +1,13 @@
+body::after {
+    content: "";
+    opacity: 0.3;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: -1;   
+    background-image: url(images/IdeaNova_Logo_Grey.png);
+    background-repeat: no-repeat;
+    background-position-y: bottom;
+}

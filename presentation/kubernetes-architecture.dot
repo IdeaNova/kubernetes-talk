@@ -1,0 +1,59 @@
+digraph G {
+  compound=true; nodesep=1.0;
+  rankdir=TB
+  graph [fontsize=32, fontname="Verdana:bold", style="rounded, filled", color="#EAEDED", fillcolor="#F4F6F6"];
+  node [shape=rectangle fontsize=32 fontname="Verdana:bold", color="#5499C7", fillcolor="#7FB3D5" style="filled, bold"];
+  kubectl [shape=diamond, color="#85929E", fillcolor="#AEB6BF"]
+  cluster_client[label="Service clients", color="#F7DC6F", fillcolor="#FCF3CF" ]
+  {rank = same; kubectl; cluster_client;}
+
+  kubectl -> apiServer;
+  subgraph cluster_master {
+      apiServer[label = "API Server"]; 
+      scheduler
+      controllerManager[label = "controller-manager"]
+      controllerManager -> apiServer;
+      scheduler -> apiServer;
+      label = "Master Node";
+      apiServer -> etcd;
+
+      etcd [shape=oval];
+      {rank=same; apiServer etcd}
+      {rank=max; controllerManager scheduler}
+  }
+  subgraph cluster_worker {
+      label = "Worker Node";
+      kubeproxy [shape=rectangle, label="kube-proxy"];
+      kubelet [shape=rectangle, label="kubelet"];
+      {rank = min; kubeproxy, kubelet};
+      kubelet -> apiServer [dir=both];
+      kubelet -> kubeproxy
+      subgraph cluster_docker {
+        label = "docker";
+        color = "#BFC9CA";
+        fillcolor = "#D5DBDB";
+        subgraph cluster_pod1 {
+          label = "pod";
+          color = "#839192";
+          fillcolor = "#BFC9CA"
+          1 [label=container]
+          2 [label=container]
+          3 [label=container]
+        }
+
+        subgraph cluster_pod2 {
+          label=pod;
+          color = "#839192";
+          fillcolor = "#BFC9CA"
+          4 [label=container];
+        }
+      };
+      kubeproxy -> 2 [lhead=cluster_pod1];
+      kubeproxy -> 4 [lhead=cluster_pod2];    
+      cluster_client -> kubeproxy;
+      etcd1 [label=etcd, shape=oval]
+     
+      etcd -> etcd1 [dir=both]
+  }
+  
+}
