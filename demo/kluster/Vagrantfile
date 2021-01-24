@@ -15,10 +15,10 @@ Vagrant.configure("2") do |config|
         v.customize ["modifyvm", :id, "--cpus", i == 0 ? "2" : "1"]  
       end
       node.vm.provision "shell", path: "./install.sh"
-      node.trigger.after :up, :provision do |trigger|
-        trigger.info = "Executing postinstall..."
-        trigger.run_remote = { path: "./post-install.sh", args: [ num_workers ] }
-      end
+      # node.trigger.after :up, :provision do |trigger|
+      #   trigger.info = "Executing postinstall..."
+      #   trigger.run_remote = { path: "./post-install.sh", args: [ num_workers ] }
+      # end
     end
   end
 

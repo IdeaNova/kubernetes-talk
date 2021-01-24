@@ -3,3 +3,4 @@
 .kube_config
 join.sh
 *.log
+tmp
