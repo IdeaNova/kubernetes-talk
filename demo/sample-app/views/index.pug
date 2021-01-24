@@ -3,8 +3,9 @@ html
     title= title
   body
     h1= title
-    h2 environment
-    ul
-        for name in Object.keys(env).sort()
-          li=`${name}: ${env[name]}`
+    for ds in Object.keys(data)
+      h2=`${ds}`
+      ul
+          for name in Object.keys(data[ds]).sort()
+            li=`${name}: ${data[ds][name]}`
     p !{new Date()}

@@ -1,14 +1,20 @@
 /* jshint esversion: 6 */
-const express = require('express');
+import express from 'express';
 const app = express();
 
 const port = 8080;
-const process = require('process');
+import { env } from 'process';
 
 app.set('view engine', 'pug');
+
+app.get('/healthz', (req, res) => res
+    .status(200)
+    .send("healthy")
+);
+
 app.get('/', (req, res) => res.render('index', {
     title: 'Sample Application',
-    env: process.env
+    data: { environment: env, headers: req.headers }
 }));
 
 app.listen(port, () => console.log(`Sample app accessible at http://localhost:${port}/`));
