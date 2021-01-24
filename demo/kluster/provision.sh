@@ -8,7 +8,7 @@ function install_system() {
     perl -p -i -e "s/.*swap.*/#/g" /etc/fstab
     ufw disable
     apt-get update
-    apt-get install -y containerd
+    apt-get install -y containerd traceroute
     mkdir -p /etc/containerd
     # configure containerd, override runtime and setup local image registry for http
     # sed -re 's/(\s+)\[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc\]$/\0\n\1  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]\n\1     SystemdCgroup = true/' \
@@ -38,21 +38,23 @@ function prepare_kernel() {
 }
 
 function install_cni() {
-    su - -c ' \
+    cidr=$1
+    su - -c " \
         kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml; \
         curl https://docs.projectcalico.org/manifests/custom-resources.yaml | \
-        sed -e "s/cidr:.*/cidr: $pod_subnet/" | \
-        kubectl create -f -' \
+        sed -e \"s#cidr:.*#cidr: $cidr#\" | \
+        tee /vagrant/tmp/custom-resources.yaml | \
+        kubectl create -f -" \
     vagrant
 }
 
 function append_log() {
-    xargs -l -0 -I{} echo [$(date)] {} | tee -a /vagrant/tmp/$hostname.log
+    xargs -l -I{} echo [$(date)] {} | tee -a /vagrant/tmp/$hostname.log
 }
 
 base_ip=$(grep 192 /vagrant/Vagrantfile | sed 's/[^0-9,\.]//g' | cut -f2 -d,)
 this_ip=$(ifconfig | grep $base_ip| sed -e 's/\s\s*/ /g' | cut -f 3 -d ' ')
-pod_subnet=10.11.0.0/16
+pod_subnet=192.168.99.0/24
 
 # install
 echo installing $hostname | append_log
@@ -79,13 +81,12 @@ if [ "$hostname" = "master" ]; then
     su - -c ' \
         mkdir -p $HOME/.kube; \
         sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config; \
-        sudo chown $(id -u):$(id -g) $HOME/.kube/config; \
-        kubectl apply -f https://raw.githubusercontent.com/cloudnativelabs/kube-router/master/daemonset/kubeadm-kuberouter.yaml' \
+        sudo chown $(id -u):$(id -g) $HOME/.kube/config; ' \
     vagrant 2>&1 | append_log
     # export .kube_config to host 
     cp /etc/kubernetes/admin.conf /vagrant/tmp/.kube_config  2>&1 | append_log
     # install calico as a CNI plugin
-    install_cni 2>&1 | append_log
+    install_cni $pod_subnet 2>&1 | append_log
     # generate and setup join script
     echo $(kubeadm token create --print-join-command) --cri-socket /run/containerd/containerd.sock > /vagrant/tmp/join.sh
 else
