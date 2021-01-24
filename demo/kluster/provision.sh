@@ -40,7 +40,9 @@ function prepare_kernel() {
 function install_cni() {
     su - -c ' \
         kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml; \
-        kubectl create -f https://docs.projectcalico.org/manifests/custom-resources.yaml' \
+        curl https://docs.projectcalico.org/manifests/custom-resources.yaml | \
+        sed -e "s/cidr:.*/cidr: $pod_subnet/" | \
+        kubectl create -f -' \
     vagrant
 }
 
@@ -50,6 +52,7 @@ function append_log() {
 
 base_ip=$(grep 192 /vagrant/Vagrantfile | sed 's/[^0-9,\.]//g' | cut -f2 -d,)
 this_ip=$(ifconfig | grep $base_ip| sed -e 's/\s\s*/ /g' | cut -f 3 -d ' ')
+pod_subnet=10.11.0.0/16
 
 # install
 echo installing $hostname | append_log
@@ -67,7 +70,7 @@ if [ "$hostname" = "master" ]; then
     kubeadm config print init-defaults --component-configs KubeletConfiguration | \
         sed -re "s#(advertiseAddress:).*#\1 $this_ip#" | \
         sed -re "s#(criSocket:).*#\1 /run/containerd/containerd.sock#" | \
-        sed -re 's#(\s+)serviceSubnet.*#\0\n\1podSubnet: 192.168.0.0/16#g' > /vagrant/tmp/cfg.yml
+        sed -re "s#(\s+)serviceSubnet.*#\0\n\1podSubnet: $pod_subnet#g" > /vagrant/tmp/cfg.yml
     # Apprend cgroup driver spec
     echo cgroupDriver: systemd >> /vagrant/tmp/cfg.yml
     # initialize cluster
