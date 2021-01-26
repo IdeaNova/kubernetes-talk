@@ -9,7 +9,7 @@
   "author": "Janne Pelkonen/IdeaNova Technologies, Inc.",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.16.4",
-    "pug": "^2.0.3"
+    "express": "^4",
+    "pug": "^3"
   }
 }
