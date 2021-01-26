@@ -7,7 +7,7 @@ Janne Pelkonen, CTO, IdeaNova Technologies, Inc.
 - Demo
   - Creating a sample application and a local cluster
   - Deploying, running and scaling the sample
-- Presentation and demo is available on Github
+- Presentation and demo is available on Github (https://github.com/IdeaNova/kubernetes-talk)
 
 ==
 

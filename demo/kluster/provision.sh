@@ -54,7 +54,7 @@ function append_log() {
 
 base_ip=$(grep 192 /vagrant/Vagrantfile | sed 's/[^0-9,\.]//g' | cut -f2 -d,)
 this_ip=$(ifconfig | grep $base_ip| sed -e 's/\s\s*/ /g' | cut -f 3 -d ' ')
-pod_subnet=192.168.99.0/24
+pod_subnet=10.11.0.0/16
 
 # install
 echo installing $hostname | append_log
